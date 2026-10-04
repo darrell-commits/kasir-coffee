@@ -1,0 +1,253 @@
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
+  padding: 20px;
+  align-items: start;
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.categoryRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.categoryBtn {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.categoryBtnActive {
+  background: var(--coffee);
+  color: #fff;
+  border-color: var(--coffee);
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.productCard {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: box-shadow 0.15s, transform 0.1s;
+}
+
+.productCard:hover:not(:disabled) {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.productCard:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.productIconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 104px;
+  overflow: hidden;
+  padding: 8px 0;
+  background: var(--cream-2);
+  border-radius: 8px;
+}
+
+.productPhoto {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center;
+}
+
+.productName {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.productPrice {
+  color: var(--coffee);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.productStock {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.cartPanel {
+  position: sticky;
+  top: 20px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+.cartItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.cartNote {
+  margin-top: 7px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.preferenceField {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.preferenceLabel {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.preferenceOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.preferenceButton {
+  min-height: 28px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+.preferenceButton:hover {
+  border-color: var(--coffee-light);
+}
+
+.preferenceActive {
+  border-color: #52745d;
+  background: #edf3ee;
+  color: #31523a;
+}
+
+.orderTypeField {
+  display: grid;
+  gap: 7px;
+  padding: 4px 0 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.orderTypeOptions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.orderTypeButton {
+  min-height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.orderTypeButton:hover {
+  border-color: var(--coffee-light);
+}
+
+.orderTypeActive {
+  border-color: #52745d;
+  background: #edf3ee;
+  color: #31523a;
+}
+
+.qtyControl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qtyBtn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--cream-2);
+  font-weight: 700;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--coffee-dark);
+  border-top: 1px dashed var(--border);
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+@media (max-width: 760px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 14px;
+  }
+
+  .toolbar {
+    flex-wrap: wrap;
+  }
+
+  .toolbar .input {
+    min-width: 0;
+  }
+
+  .cartPanel {
+    position: static;
+    max-height: none;
+  }
+}
