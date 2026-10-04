@@ -3,6 +3,8 @@ import { getPool } from "@/lib/db";
 import { LOW_STOCK_THRESHOLD } from "@/lib/config";
 import styles from "./dashboard.module.css";
 
+export const dynamic = "force-dynamic";
+
 function formatRupiah(value) {
   return "Rp" + Number(value || 0).toLocaleString("id-ID");
 }
