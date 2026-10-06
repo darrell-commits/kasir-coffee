@@ -12,11 +12,41 @@ const IMAGE_TYPES = new Map([
 ]);
 const MAX_IMAGE_SIZE = 4 * 1024 * 1024;
 
+async function ensureImageColumns(pool) {
+  const [columns] = await pool.query(
+    `SELECT COLUMN_NAME
+     FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE()
+       AND TABLE_NAME = 'products'
+       AND COLUMN_NAME IN ('image_data', 'image_mime')`
+  );
+  const existingColumns = new Set(columns.map((column) => column.COLUMN_NAME));
+
+  if (!existingColumns.has("image_data")) {
+    try {
+      await pool.query(
+        "ALTER TABLE products ADD COLUMN image_data MEDIUMBLOB DEFAULT NULL AFTER image_url"
+      );
+    } catch (error) {
+      if (error?.code !== "ER_DUP_FIELDNAME") throw error;
+    }
+  }
+  if (!existingColumns.has("image_mime")) {
+    try {
+      await pool.query(
+        "ALTER TABLE products ADD COLUMN image_mime VARCHAR(30) DEFAULT NULL AFTER image_data"
+      );
+    } catch (error) {
+      if (error?.code !== "ER_DUP_FIELDNAME") throw error;
+    }
+  }
+}
+
 function databaseErrorResponse(error) {
   console.error("Product image storage failed:", error);
-  if (error?.code === "ER_BAD_FIELD_ERROR") {
+  if (["ER_DBACCESS_DENIED_ERROR", "ER_TABLEACCESS_DENIED_ERROR"].includes(error?.code)) {
     return NextResponse.json(
-      { message: "Penyimpanan foto belum disiapkan. Jalankan migrasi database 001_product_image_storage.sql." },
+      { message: "Akun database aplikasi tidak memiliki izin untuk menyiapkan penyimpanan foto. Minta administrator database memberi izin ALTER pada tabel products." },
       { status: 503 }
     );
   }
@@ -71,6 +101,7 @@ export async function POST(request, { params }) {
 
   try {
     const pool = getPool();
+    await ensureImageColumns(pool);
     const imageUrl = `/api/products/${params.id}/image`;
     const [result] = await pool.execute(
       `UPDATE products
