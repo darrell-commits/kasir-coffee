@@ -27,6 +27,30 @@ function formatRupiah(value) {
   return "Rp" + Number(value || 0).toLocaleString("id-ID");
 }
 
+async function readApiResponse(response, fallbackMessage) {
+  const body = await response.text();
+  let result;
+
+  try {
+    result = body ? JSON.parse(body) : null;
+  } catch {
+    throw new Error(
+      `Respons server tidak valid (HTTP ${response.status}). Periksa terminal localhost.`
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(result?.message || `${fallbackMessage} (HTTP ${response.status}).`);
+  }
+  if (!result || typeof result !== "object") {
+    throw new Error(
+      `Server tidak mengirim data yang diharapkan (HTTP ${response.status}).`
+    );
+  }
+
+  return result;
+}
+
 export default function KasirMenuPage() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -160,10 +184,12 @@ export default function KasirMenuPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || "Gagal menyimpan menu.");
+      const result = await readApiResponse(response, "Gagal menyimpan menu.");
 
       const productId = form.id || result.id;
+      if (!form.id) {
+        setForm((current) => ({ ...current, id: productId }));
+      }
       if (photo) {
         const imageForm = new FormData();
         imageForm.append("image", photo);
@@ -171,11 +197,7 @@ export default function KasirMenuPage() {
           method: "POST",
           body: imageForm,
         });
-        const imageResult = await imageResponse.json();
-        if (!imageResponse.ok) {
-          setForm((current) => ({ ...current, id: productId }));
-          throw new Error(imageResult.message || "Gagal mengunggah foto.");
-        }
+        await readApiResponse(imageResponse, "Gagal mengunggah foto.");
       }
 
       setIsOpen(false);
