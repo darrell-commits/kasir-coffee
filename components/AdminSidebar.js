@@ -9,6 +9,8 @@ const menu = [
   { href: "/admin/dashboard", label: "Dashboard", icon: "📊" },
   { href: "/admin/produk", label: "Produk", icon: "☕" },
   { href: "/admin/kategori", label: "Kategori", icon: "🗂️" },
+  { href: "/admin/transaksi", label: "Transaksi", icon: "🧾" },
+  { href: "/admin/member", label: "Member", icon: "👥" },
 ];
 
 export default function AdminSidebar() {

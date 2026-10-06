@@ -18,6 +18,7 @@ export async function GET(request) {
     return NextResponse.json({ message: "Silakan login." }, { status: 401 });
   }
 
+  const { searchParams } = new URL(request.url);
   const pool = getPool();
   let sql = `
     SELECT t.*, u.name AS cashier_name, m.name AS member_name, m.phone AS member_phone
@@ -25,15 +26,54 @@ export async function GET(request) {
     JOIN users u ON u.id = t.cashier_id
     LEFT JOIN members m ON m.id = t.member_id
   `;
+  const conditions = [];
   const params = [];
 
   // Kasir hanya boleh melihat transaksinya sendiri.
   if (session.role === "kasir") {
-    sql += " WHERE t.cashier_id = ?";
+    conditions.push("t.cashier_id = ?");
     params.push(session.id);
+  } else if (session.role !== "admin") {
+    return NextResponse.json({ message: "Tidak diizinkan." }, { status: 403 });
   }
 
-  sql += " ORDER BY t.created_at DESC LIMIT 100";
+  const search = searchParams.get("search")?.trim();
+  if (search) {
+    conditions.push("(t.invoice_number LIKE ? OR m.name LIKE ? OR u.name LIKE ?)");
+    const term = `%${search}%`;
+    params.push(term, term, term);
+  }
+
+  const from = searchParams.get("from");
+  const to = searchParams.get("to");
+  const isValidDate = (value) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) return false;
+    const date = new Date(`${value}T00:00:00Z`);
+    return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+  };
+
+  if (from && !isValidDate(from)) {
+    return NextResponse.json({ message: "Tanggal awal tidak valid." }, { status: 400 });
+  }
+  if (to && !isValidDate(to)) {
+    return NextResponse.json({ message: "Tanggal akhir tidak valid." }, { status: 400 });
+  }
+  if (from && to && from > to) {
+    return NextResponse.json({ message: "Tanggal awal tidak boleh melewati tanggal akhir." }, { status: 400 });
+  }
+  if (from) {
+    conditions.push("t.created_at >= ?");
+    params.push(`${from} 00:00:00`);
+  }
+  if (to) {
+    conditions.push("t.created_at < DATE_ADD(?, INTERVAL 1 DAY)");
+    params.push(`${to} 00:00:00`);
+  }
+  if (conditions.length) {
+    sql += ` WHERE ${conditions.join(" AND ")}`;
+  }
+
+  sql += " ORDER BY t.created_at DESC LIMIT 500";
 
   const [rows] = await pool.execute(sql, params);
   return NextResponse.json(rows);
