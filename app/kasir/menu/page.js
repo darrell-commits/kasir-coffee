@@ -337,7 +337,7 @@ export default function KasirMenuPage() {
                     onChange={(event) => setPhoto(event.target.files?.[0] || null)}
                   />
                 </label>
-                <span className={styles.helpText}>JPG, PNG, WebP · maks. 5 MB</span>
+                <span className={styles.helpText}>JPG, PNG, WebP · maks. 4 MB</span>
               </div>
 
               {preview && (

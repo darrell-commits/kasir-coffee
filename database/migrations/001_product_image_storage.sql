@@ -1,0 +1,3 @@
+ALTER TABLE products
+  ADD COLUMN image_data MEDIUMBLOB DEFAULT NULL AFTER image_url,
+  ADD COLUMN image_mime VARCHAR(30) DEFAULT NULL AFTER image_data;

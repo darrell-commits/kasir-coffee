@@ -9,7 +9,10 @@ export async function GET(request) {
 
   const pool = getPool();
   let sql = `
-    SELECT p.*, c.name AS category_name, c.icon AS category_icon
+    SELECT p.id, p.name, p.category_id, p.price, p.stock, p.description,
+           p.icon, p.image_url, p.image_x, p.image_y, p.image_zoom,
+           p.status, p.created_at, p.updated_at,
+           c.name AS category_name, c.icon AS category_icon
     FROM products p
     JOIN categories c ON c.id = p.category_id
     WHERE p.status = 'aktif'
